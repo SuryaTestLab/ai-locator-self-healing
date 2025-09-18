@@ -24,8 +24,7 @@ public class DemoTest {
 
     @Test
     void login_with_self_healing(){
-//        driver.get("https://onlinebanking.usbank.com/auth/login/");
-        driver.get("https://www.bankofamerica.com/");
+        driver.get("https://www.example.com/login");
         driver.manage().window().maximize();
 
         // Primary locator may break later; SelfHealingBy will recover
