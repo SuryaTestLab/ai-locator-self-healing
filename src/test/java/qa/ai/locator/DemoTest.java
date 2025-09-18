@@ -8,7 +8,6 @@ import org.openqa.selenium.chrome.ChromeDriver;
 import java.nio.file.Path;
 import java.time.Duration;
 
-@log4j2
 public class DemoTest {
     WebDriver driver;
     SignatureStore store;
