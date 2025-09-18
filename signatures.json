@@ -1,0 +1,62 @@
+{
+  "login.username.input" : {
+    "key" : "login.username.input",
+    "text" : "",
+    "tag" : "input",
+    "attrs" : {
+      "name" : "onlineId1",
+      "id" : "onlineId1",
+      "placeholder" : "User ID",
+      "type" : "text",
+      "data-testid" : "",
+      "value" : ""
+    },
+    "ariaRole" : "",
+    "neighborTextLeft" : "Log In with your User ID",
+    "neighborTextAbove" : "Log In with your User ID\nEnter your password\n \nSave User ID⁠\n⁠\nLog In",
+    "classes" : [ "cs-onlineId1", "spa-input-text" ],
+    "pathCss" : "input#onlineId1",
+    "pathXpath" : "//*[@id=\"onlineId1\"]",
+    "url" : "https://www.bankofamerica.com/"
+  },
+  "login.password.input" : {
+    "key" : "login.password.input",
+    "text" : "",
+    "tag" : "input",
+    "attrs" : {
+      "name" : "passcode1",
+      "id" : "passcode1",
+      "placeholder" : "Password",
+      "type" : "password",
+      "data-testid" : "",
+      "value" : ""
+    },
+    "ariaRole" : "",
+    "neighborTextLeft" : "Enter your password",
+    "neighborTextAbove" : "Log In with your User ID",
+    "classes" : [ "tl-private", "cs-passcode1", "spa-input-text" ],
+    "pathCss" : "input#passcode1",
+    "pathXpath" : "//*[@id=\"passcode1\"]",
+    "url" : "https://www.bankofamerica.com/"
+  },
+  "login.submit.button" : {
+    "key" : "login.submit.button",
+    "text" : "Log In",
+    "tag" : "button",
+    "attrs" : {
+      "name" : "",
+      "id" : "signIn",
+      "placeholder" : "",
+      "type" : "submit",
+      "data-testid" : "",
+      "value" : ""
+    },
+    "ariaRole" : "",
+    "neighborTextLeft" : "Log In",
+    "neighborTextAbove" : "Save User ID⁠\n⁠",
+    "classes" : [ "spa-btn", "spa-btn--primary", "spa-btn--block", "spa-btn--medium" ],
+    "pathCss" : "button#signIn",
+    "pathXpath" : "//*[@id=\"signIn\"]",
+    "url" : "https://www.bankofamerica.com/"
+  }
+}
