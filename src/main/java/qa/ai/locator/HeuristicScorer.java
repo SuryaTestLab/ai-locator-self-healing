@@ -1,64 +1,60 @@
 package qa.ai.locator;
 
 import org.openqa.selenium.*;
-import org.apache.commons.text.similarity.JaroWinklerSimilarity;
+
 import java.util.*;
+
+import static qa.ai.locator.SelfHealingBy.*;
+import static qa.ai.locator.Utils.*;
 
 public class HeuristicScorer {
 
-    public static LocatorCandidate pickBest(WebDriver driver,
-                                            List<LocatorCandidate> candidates,
-                                            ElementSignature previous){
-        JaroWinklerSimilarity jw = new JaroWinklerSimilarity();
-        LocatorCandidate best = null;
-        double bestScore = -1;
+    public long heuristicScore(WebElement el, Set<String> tokens) {
+        long score = 0;
+        try {
+            String tag = lower(el.getTagName());
+            String text = safe(el.getText());
+            String id = attr(el, "id"), name = attr(el, "name"), testid = attr(el, "data-testid");
+            String aria = attr(el, "aria-label"), placeholder = attr(el, "placeholder"), cls = attr(el, "class");
 
-        for (LocatorCandidate c: candidates){
-            try {
-                List<WebElement> found = driver.findElements(c.toBy());
-                if (found.size()!=1) continue; // want unique
-                WebElement el = found.get(0);
+            if (Set.of("input", "button", "a", "label", "select").contains(tag)) score += 60;
+            if (notBlank(testid)) score += 120;
+            if (notBlank(id)) score += 100;
+            if (notBlank(name)) score += 80;
+            if (notBlank(aria)) score += 70;
+            if (notBlank(placeholder)) score += 50;
 
-                double score = c.heuristicScore;
-
-                if (previous != null){
-                    // text similarity
-                    String nowText = safe(() -> el.getText());
-                    score += 0.3 * nz(jw.apply(previous.text==null?"":previous.text, nowText));
-
-                    // attribute overlap
-                    score += 0.2 * attrOverlap(el, previous);
-
-                    // role/neighbor hints
-                    score += 0.1 * neighborBoost(driver, el, previous);
-                }
-
-                if (score > bestScore){
-                    bestScore = score;
-                    best = c;
-                }
-            } catch (Exception ignore){}
+            String hay = String.join(" ", List.of(tag, text, id, name, testid, aria, placeholder, cls)).toLowerCase();
+            for (String t : tokens)
+                if (t.length() >= 2 && hay.contains(t.toLowerCase())) score += Math.min(180, 18 * t.length());
+            if (el.isDisplayed()) score += 40;
+            if (el.isEnabled()) score += 30;
+        } catch (Exception ignore) {
         }
-        return best;
+        return score;
     }
 
-    private static double attrOverlap(WebElement el, ElementSignature prev){
-        int total=0, match=0;
-        for (Map.Entry<String,String> e: prev.attrs.entrySet()){
-            total++;
-            String vNow = safe(() -> el.getAttribute(e.getKey()));
-            if (vNow!=null && !vNow.isBlank() && vNow.equalsIgnoreCase(e.getValue())) match++;
+    public long similarityScore(WebElement el, ElementSignature s) {
+        long score = 0;
+        try {
+            if (eq(attr(el, "id"), s.id)) score += 200;
+            if (eq(attr(el, "name"), s.name)) score += 150;
+            if (contains(attr(el, "data-testid"), s.testid)) score += 180;
+            if (contains(attr(el, "aria-label"), s.ariaLabel)) score += 120;
+
+            String text = safe(el.getText());
+            if (contains(text, s.text)) score += Math.min(200, 10L * safe(s.text).length());
+
+            score += overlap(attr(el, "class"), s.classes) * 10;
+            if (eq(lower(el.getTagName()), s.tag)) score += 60;
+        } catch (Exception ignore) {
         }
-        return total==0? 0 : (double)match/total; // 0..1
+        return score;
     }
 
-    private static double neighborBoost(WebDriver d, WebElement el, ElementSignature prev){
-        // simplistic: if left/above neighbor text still matches partially, boost
-        return 0.0; // keep simple for starter; you can use getBoundingClientRect JS like in ElementSignature
+    private double normalize(long score) {
+        double s = Math.max(0, Math.min(score, 1600));
+        return s / 1600.0;
     }
 
-    private static String safe(java.util.concurrent.Callable<String> c){
-        try { return Optional.ofNullable(c.call()).orElse(""); } catch(Exception e){ return ""; }
-    }
-    private static double nz(Double d){ return d==null? 0.0: d; }
 }
